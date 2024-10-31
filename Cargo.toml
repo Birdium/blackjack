@@ -11,6 +11,10 @@ serde = { version = "1.0.214", features = ["derive"] }
 tarpc = { version = "0.35.0", features = ["full"] }
 tokio = { version = "1.41.0", features = ["full"] }
 
+[lib]
+name = "service"
+path = "src/lib.rs"
+
 [[bin]]
 name = "server"
 path = "src/server.rs"

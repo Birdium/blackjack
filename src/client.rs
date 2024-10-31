@@ -1,38 +1,21 @@
-mod card;
-mod deck;
-mod game;
-mod player;
-mod rpc;
-
 use std::net::{IpAddr, Ipv4Addr};
 use tarpc::{
-    // client,
     context,
     serde_transport::tcp::connect, 
     tokio_serde::formats::Json
 };
-use serde::{Deserialize, Serialize};
-use service::BlackjackClient;
+use service::{BlackjackClient, GameState};
 use tokio::io::{self, AsyncBufReadExt, BufReader};
-use crate::card::Card;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct GameState {
-    pub player_hand: Vec<Card>,
-    pub dealer_hand: Vec<Card>,
-    pub result: Option<String>,
-}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // 连接服务器
     let addr = (IpAddr::V4(Ipv4Addr::LOCALHOST), 11451);
-    let mut transport = connect(addr, Json::default);
-    transport.config_mut().max_frame_length(usize::MAX);
+    let transport = connect(addr, Json::default).await?;
 
-    let mut client = BlackjackClient::new(Default::default(), transport).spawn();
+    let client = BlackjackClient::new(Default::default(), transport).spawn();
 
-    // 用户输入处理
     let stdin = BufReader::new(io::stdin());
     let mut lines = stdin.lines();
 
@@ -84,6 +67,7 @@ async fn main() -> anyhow::Result<()> {
 
 // 打印游戏状态的帮助函数
 fn print_game_state(game_state: &GameState) {
+
     println!("玩家手牌: {:?}", game_state.player_hand);
     println!("庄家手牌: {:?}", game_state.dealer_hand);
     if let Some(result) = &game_state.result {

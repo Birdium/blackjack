@@ -1,4 +1,4 @@
-use crate::card::{Card, Rank, Suit};  
+use service::{Card, Rank, Suit};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 

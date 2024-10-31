@@ -1,4 +1,4 @@
-use crate::card::{Card, Rank};
+use service::{Card, Rank};
 
 pub struct Player {
     pub hand: Vec<Card>,

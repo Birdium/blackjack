@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+// card.rs
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub enum Suit {
     Hearts,
@@ -46,4 +48,20 @@ impl Card {
             Rank::Ace => 11, // Ace can be 1 or 11, handled in hand value calculation
         }
     }
+}
+
+// rpc.rs
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GameState {
+    pub player_hand: Vec<Card>,
+    pub dealer_hand: Vec<Card>,
+    pub result: Option<String>,
+}
+
+
+#[tarpc::service]
+pub trait Blackjack {
+    async fn new_game() -> GameState;
+    async fn hit() -> GameState;
+    async fn stand() -> GameState;
 }
