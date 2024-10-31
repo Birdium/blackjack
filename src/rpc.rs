@@ -3,9 +3,8 @@ use crate::card::Card;
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use tarpc::context;
-use tarpc::serde_transport::tcp;
-use tarpc::server::{self, Channel};
-use tokio_serde::formats::Json;
+// use tarpc::serde_transport::tcp;
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GameState {
@@ -13,6 +12,7 @@ pub struct GameState {
     pub dealer_hand: Vec<Card>,
     pub result: Option<String>,
 }
+
 
 #[tarpc::service]
 pub trait Blackjack {
@@ -23,10 +23,10 @@ pub trait Blackjack {
 
 #[derive(Clone)]
 pub struct BlackjackServer {
-    game: Arc<Mutex<Game>>,
+    pub game: Arc<Mutex<Game>>,
 }
 
-#[tarpc::server]
+// #[tarpc::server]
 impl Blackjack for BlackjackServer {
     async fn new_game(self, _: context::Context) -> GameState {
         let mut game = self.game.lock().unwrap();
@@ -63,22 +63,5 @@ impl Blackjack for BlackjackServer {
             dealer_hand: game.dealer.hand.clone(),
             result,
         }
-    }
-}
-
-impl BlackjackServer {
-    pub async fn serve(self, addr: &str) -> anyhow::Result<()> {
-        let listener = tcp::listen(addr, Json::default).await?;
-        listener
-            .filter_map(|r| async { r.ok() })
-            .map(BaseChannel::with_defaults)
-            .map(|channel| {
-                let server = self.clone();
-                channel.execute(server.serve())
-            })
-            .buffer_unordered(10)
-            .for_each(|_| async {})
-            .await;
-        Ok(())
     }
 }
