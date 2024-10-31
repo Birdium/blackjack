@@ -1,0 +1,14 @@
+[package]
+name = "blackjack"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.91"
+rand = "0.8.5"
+serde = { version = "1.0.214", features = ["derive"] }
+serde_derive = "1.0.214"
+tarpc = "0.35.0"
+tokio = { version = "1.41.0", features = ["full"] }
+tokio-serde = "0.9.0"
+tokio-serde-json = "0.3.0"
